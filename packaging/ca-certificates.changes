@@ -1,0 +1,79 @@
+-------------------------------------------------------------------
+Fri May  4 11:55:14 UTC 2012 - lnussel@suse.de
+
+- give hint about SSL_CTX_set_default_verify_paths in cert bundle
+
+-------------------------------------------------------------------
+Mon Oct 24 11:57:53 UTC 2011 - coolo@suse.com
+
+- require coreutils for %post script
+
+-------------------------------------------------------------------
+Mon Jun 20 12:49:52 UTC 2011 - lnussel@suse.de
+
+- fix spurious rpm warning if no java exists (bnc#634793)
+- move java.run to java-ca-certificates
+
+-------------------------------------------------------------------
+Mon Sep 27 14:58:03 UTC 2010 - lnussel@suse.de
+
+- catch FileNotFoundException (bnc#623365)
+
+-------------------------------------------------------------------
+Fri May 21 12:46:55 UTC 2010 - mvyskocil@suse.cz
+
+* Use the gcc-java and fastjar for build to avoid dependency problems
+* build keystore.class only to allow noarch package
+
+-------------------------------------------------------------------
+Wed May 19 09:57:41 UTC 2010 - lnussel@suse.de
+
+- create java bundles
+
+-------------------------------------------------------------------
+Tue Apr 27 14:17:24 UTC 2010 - lnussel@suse.de
+
+- also use hooks from /usr/lib/ca-certificates/update.d
+- replace bundle file with symlink to file in /var as it's auto
+  generated
+
+-------------------------------------------------------------------
+Wed Apr 21 13:20:07 UTC 2010 - lnussel@suse.de
+
+- force rebuilding all certificate stores in %post
+  This also makes sure we update the hash links in /etc/ssl/certs
+  as openssl changed the hash format between 0.9.8 and 1.0
+
+-------------------------------------------------------------------
+Thu Apr  8 13:16:43 UTC 2010 - lnussel@suse.de
+
+- actually install certbundle.run (bnc#594501)
+
+-------------------------------------------------------------------
+Thu Apr  8 09:15:28 UTC 2010 - lnussel@suse.de
+
+- it's ca-bundle.pem rather than cert.pem
+
+-------------------------------------------------------------------
+Thu Apr  8 07:51:25 UTC 2010 - lnussel@suse.de
+
+- obsolete openssl-certs (bnc#594434) 
+- update manpage (bnc#594501)
+
+-------------------------------------------------------------------
+Thu Apr  1 13:00:37 UTC 2010 - lnussel@suse.de
+
+- include /etc/ca-certificates.conf as %ghost
+
+-------------------------------------------------------------------
+Fri Mar 26 15:26:01 UTC 2010 - lnussel@suse.de
+
+- generate ca-bundle with hook script
+- don't use trusted certificates in ca-bundle file for compatibility
+  with gnutls
+
+-------------------------------------------------------------------
+Wed Mar 24 10:31:47 UTC 2010 - lnussel@suse.de
+
+- new package
+
