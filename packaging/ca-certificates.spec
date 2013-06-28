@@ -13,6 +13,7 @@ Source0:        update-ca-certificates
 Source1:        update-ca-certificates.8
 Source2:        GPL-2.0.txt
 Source3:        certbundle.run
+Source1001: 	ca-certificates.manifest
 Url:            http://gitorious.org/opensuse/ca-certificates
 Requires:       openssl
 Requires(post): /usr/bin/rm
@@ -26,6 +27,7 @@ Utilities for system wide CA certificate installation
 
 %prep
 %setup -qcT
+cp %{SOURCE1001} .
 install -m 755 %{SOURCE0} .
 install -m 644 %{SOURCE1} .
 install -m 644 %{SOURCE2} COPYING
@@ -61,6 +63,7 @@ update-ca-certificates -f || true
 
 
 %files
+%manifest %{name}.manifest
 %defattr(-, root, root)
 %dir %{usrcadir}
 %dir %{etccadir}
