@@ -32,7 +32,8 @@ use Getopt::Long;
 my $certsconf = '/etc/ca-certificates.conf';
 my $hooksdir1 = '/etc/ca-certificates/update.d';
 my $hooksdir2 = '/usr/lib/ca-certificates/update.d';
-my $certsdir = "/usr/share/ca-certificates";
+# only search /usr/share/ca-certificates/certs because of code-signing certs
+my $certsdir = "/usr/share/ca-certificates/certs";
 my $localcertsdir = "/usr/local/share/ca-certificates";
 my $etccertsdir = "/etc/ssl/certs";
 
@@ -56,6 +57,7 @@ sub addcert($)
 {
 	my $f = $_[0];
 	my $t = targetfilename($f);
+
 	return if -e $t;
 	unlink $t if -l $t; # dangling symlink
 	if (symlink($f, $t)) {
@@ -129,7 +131,7 @@ my @files;
 File::Find::find({
 	no_chdir => 1,
 	wanted => sub {
-		-f && /\.(?:pem|crt)$/ && push @files, $_;
+		-f && /\.(?:pem|crt|[0-9])$/ && push @files, $_;
 		}
 	}, $certsdir);
 for my $f (@files) {
@@ -146,7 +148,7 @@ for my $f (glob "$localcertsdir/*.{pem,crt}") {
 	addcert($f);
 }
 
-for my $f (glob "$etccertsdir/*.pem") {
+for my $f (glob "$etccertsdir/*.{pem,[0-9]}") {
 	if (-l $f && !-e $f) {
 		if (startswith($f, $etccertsdir)
 		|| startswith($f, $localcertsdir))
@@ -161,8 +163,10 @@ for my $f (glob "$etccertsdir/*.pem") {
 chdir $etccertsdir || die "$!";
 if (%added || %removed || $opt_fresh) {
 	print "Updating certificates in $etccertsdir...\n";
-	my $redir = ($opt_verbose?'':'> /dev/null');
-	system("c_rehash . $redir");
+# tizen ca-certs suffix isn't .pem|.crt|.cer|.crl
+# so c_rehash cannot be used.
+#	my $redir = ($opt_verbose?'':'> /dev/null');
+#	system("c_rehash . $redir");
 
 	printf("%d added, %d removed.\n",
 		(%added?(scalar keys %added):0),

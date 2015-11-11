@@ -16,6 +16,8 @@ Source3:        certbundle.run
 Source1001: 	ca-certificates.manifest
 Url:            http://gitorious.org/opensuse/ca-certificates
 Requires:       openssl
+Requires:       smack
+Requires:       coreutils
 Requires(post): /usr/bin/rm
 Requires(post): openssl-misc
 Recommends:     ca-certificates-mozilla
@@ -61,6 +63,10 @@ fi
 # as openssl changed the hash format between 0.9.8 and 1.0
 update-ca-certificates -f || true
 
+chown root:system %{etccadir}
+chmod 775 %{etccadir}
+chsmack -a "System::Shared" %{etccadir}
+chsmack -t %{etccadir}
 
 %files
 %manifest %{name}.manifest

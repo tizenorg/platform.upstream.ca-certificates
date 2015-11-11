@@ -29,7 +29,12 @@ cat > "$cafile.new" <<EOF
 # SSL_CTX_set_default_verify_paths() instead.
 #
 EOF
-for i in "$cadir"/*.pem; do
+for i in `find $cadir/*`; do
+	fname=`echo $i | cut -f 5 -d '/'`
+	if [[ ! $fname =~ ^[0-9a-z]{8}\.[0-9]$ ]]; then
+		continue
+	fi
+
 	# only include certificates trusted for server auth
 	if grep -q "BEGIN TRUSTED CERTIFICATE" "$i"; then
 		trust=`sed -n '/^# openssl-trust=/{s/^.*=//;p;q;}' "$i"`
@@ -41,3 +46,7 @@ for i in "$cadir"/*.pem; do
 	openssl x509 -in "$i"
 done >> "$cafile.new"
 mv "$cafile.new" "$cafile"
+
+chown root:system $cafile
+chmod 664 $cafile
+chsmack -a "System::Shared" $cafile
