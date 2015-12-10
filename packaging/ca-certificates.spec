@@ -5,7 +5,7 @@ Name:           ca-certificates
 %define cabundle  /var/lib/ca-certificates/ca-bundle.pem
 %define usrcadir  %{_datadir}/ca-certificates
 License:        GPL-2.0+
-Group:          Productivity/Networking/Security
+Group:          Security/Certificate Management
 Version:        1
 Release:        0
 Summary:        Utilities for system wide CA certificate installation
