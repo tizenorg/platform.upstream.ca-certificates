@@ -36,13 +36,15 @@ for i in `find $cadir/*`; do
 	fi
 
 	# only include certificates trusted for server auth
-	if grep -q "BEGIN TRUSTED CERTIFICATE" "$i"; then
-		trust=`sed -n '/^# openssl-trust=/{s/^.*=//;p;q;}' "$i"`
-		case "$trust" in
-			*serverAuth*) ;;
-			*) [ -z "$verbose" ] || echo "skipping $i" >&2; continue ;;
-		esac
-	fi
+# Tizen patch: all certs will be trusted for server auth.
+#              cafile is popularly used on Tizen platform.
+#	if grep -q "BEGIN TRUSTED CERTIFICATE" "$i"; then
+#		trust=`sed -n '/^# openssl-trust=/{s/^.*=//;p;q;}' "$i"`
+#		case "$trust" in
+#			*serverAuth*) ;;
+#			*) [ -z "$verbose" ] || echo "skipping $i" >&2; continue ;;
+#		esac
+#	fi
 	openssl x509 -in "$i"
 done >> "$cafile.new"
 mv "$cafile.new" "$cafile"
