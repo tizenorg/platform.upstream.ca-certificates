@@ -1,10 +1,6 @@
 BuildRequires:  openssl
 BuildRequires:  pkgconfig(libtzplatform-config)
 Name:           ca-certificates
-%define ssletcdir %{_sysconfdir}/ssl
-%define etccadir  %{ssletcdir}/certs
-%define cabundle  /var/lib/ca-certificates/ca-bundle.pem
-%define usrcadir  %{_datadir}/ca-certificates
 License:        GPL-2.0+
 Group:          Security/Certificate Management
 Version:        1
@@ -37,6 +33,13 @@ Requires: %name = %version
 ca-certificates devel package which contains RPM macros
 for ca-bundle and ssl certs directory
 
+# sync ssletcdir with openssldir
+%define ssletcdir %{_sysconfdir}/ssl
+
+%define etccadir    %{ssletcdir}/certs
+%define usrcadir    %{_datadir}/ca-certificates/certs
+%define cabundle    /var/lib/ca-certificates/ca-bundle.pem
+%define usrcabundle %{ssletcdir}/ca-bundle.pem
 
 %prep
 %setup -qcT
@@ -46,7 +49,6 @@ install -m 644 %{SOURCE1} .
 install -m 644 %{SOURCE2} COPYING
 
 %build
-
 
 
 %install
@@ -59,7 +61,7 @@ mkdir -p %{buildroot}%{_prefix}/lib/ca-certificates/update.d
 install -D -m 644 /dev/null %{buildroot}/%{cabundle}
 install -m 644 /dev/null %{buildroot}/etc/ca-certificates.conf
 install -m 755 %{SOURCE3} %{buildroot}%{_prefix}/lib/ca-certificates/update.d
-ln -s %{cabundle} %{buildroot}%{ssletcdir}/ca-bundle.pem
+ln -s %{cabundle} %{buildroot}%{usrcabundle}
 
 install -m 755 update-ca-certificates %{buildroot}/%{_sbindir}
 install -m 644 update-ca-certificates.8 %{buildroot}/%{_mandir}/man8
@@ -68,10 +70,10 @@ install -m 644 /dev/null %{buildroot}/var/lib/ca-certificates/ca-bundle.pem
 mkdir -p %{buildroot}%{_sysconfdir}/rpm
 %define macro_ca_certificates %{_sysconfdir}/rpm/macros.ca-certificates
 touch %{buildroot}%{macro_ca_certificates}
-echo "%TZ_SYS_CA_BUNDLE     %{TZ_SYS_ETC}/ssl/ca-bundle.pem"        >> %{buildroot}%{macro_ca_certificates}
-echo "%TZ_SYS_CA_BUNDLE_RW  /var/lib/ca-certificates/ca-bundle.pem" >> %{buildroot}%{macro_ca_certificates}
-echo "%TZ_SYS_CA_CERTS      %{TZ_SYS_ETC}/ssl/certs"                >> %{buildroot}%{macro_ca_certificates}
-echo "%TZ_SYS_CA_CERTS_ORIG %{TZ_SYS_SHARE}/ca-certificates/certs"  >> %{buildroot}%{macro_ca_certificates}
+echo "%TZ_SYS_CA_CERTS      %{etccadir}"    >> %{buildroot}%{macro_ca_certificates}
+echo "%TZ_SYS_CA_CERTS_ORIG %{usrcadir}"    >> %{buildroot}%{macro_ca_certificates}
+echo "%TZ_SYS_CA_BUNDLE     %{usrcabundle}" >> %{buildroot}%{macro_ca_certificates}
+echo "%TZ_SYS_CA_BUNDLE_RW  %{cabundle}"    >> %{buildroot}%{macro_ca_certificates}
 
 %post
 # this is just needed for those updating Factory,
@@ -96,7 +98,7 @@ chsmack -t %{etccadir}
 %dir %{etccadir}
 %license COPYING
 %ghost %config(noreplace) /etc/ca-certificates.conf
-%{ssletcdir}/ca-bundle.pem
+%{usrcabundle}
 %ghost %{cabundle}
 %dir /etc/ca-certificates
 %dir /etc/ca-certificates/update.d
@@ -106,7 +108,7 @@ chsmack -t %{etccadir}
 %{_prefix}/lib/ca-certificates/update.d/certbundle.run
 %{_sbindir}/update-ca-certificates
 %{_mandir}/man8/update-ca-certificates.8*
-%ghost /var/lib/ca-certificates/ca-bundle.pem
+%ghost %{cabundle}
 
 %files devel
 %config %{macro_ca_certificates}
