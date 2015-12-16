@@ -165,6 +165,8 @@ if (%added || %removed || $opt_fresh) {
 	print "Updating certificates in $etccertsdir...\n";
 # tizen ca-certs suffix isn't .pem|.crt|.cer|.crl
 # so c_rehash cannot be used.
+# c_rehash is from openssl-misc rpm and it's excluded on tizen platform binary.
+# if needed later, c_rehash need to be reimplemented by shell script
 #	my $redir = ($opt_verbose?'':'> /dev/null');
 #	system("c_rehash . $redir");
 

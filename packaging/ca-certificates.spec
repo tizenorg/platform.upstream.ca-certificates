@@ -10,13 +10,12 @@ Source0:        update-ca-certificates
 Source1:        update-ca-certificates.8
 Source2:        GPL-2.0.txt
 Source3:        certbundle.run
-Source1001: 	ca-certificates.manifest
+Source1001:     ca-certificates.manifest
 Url:            http://gitorious.org/opensuse/ca-certificates
 Requires:       openssl
 Requires:       smack
 Requires:       coreutils
 Requires(post): /usr/bin/rm
-Requires(post): openssl-misc
 Recommends:     ca-certificates-mozilla
 BuildArch:      noarch
 
