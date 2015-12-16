@@ -1,4 +1,5 @@
 BuildRequires:  openssl
+BuildRequires:  pkgconfig(libtzplatform-config)
 Name:           ca-certificates
 %define ssletcdir %{_sysconfdir}/ssl
 %define etccadir  %{ssletcdir}/certs
@@ -23,9 +24,19 @@ Requires(post): openssl-misc
 Recommends:     ca-certificates-mozilla
 BuildArch:      noarch
 
-
 %description
 Utilities for system wide CA certificate installation
+
+%package devel
+Summary:  Devel package of ca-certificates which contains RPM macros
+Group:    Development/Libraries
+License:  GPL-2.0+
+Requires: %name = %version
+
+%description devel
+ca-certificates devel package which contains RPM macros
+for ca-bundle and ssl certs directory
+
 
 %prep
 %setup -qcT
@@ -35,6 +46,8 @@ install -m 644 %{SOURCE1} .
 install -m 644 %{SOURCE2} COPYING
 
 %build
+
+
 
 %install
 mkdir -p %{buildroot}/%{etccadir}
@@ -51,6 +64,14 @@ ln -s %{cabundle} %{buildroot}%{ssletcdir}/ca-bundle.pem
 install -m 755 update-ca-certificates %{buildroot}/%{_sbindir}
 install -m 644 update-ca-certificates.8 %{buildroot}/%{_mandir}/man8
 install -m 644 /dev/null %{buildroot}/var/lib/ca-certificates/ca-bundle.pem
+
+mkdir -p %{buildroot}%{_sysconfdir}/rpm
+%define macro_ca_certificates %{_sysconfdir}/rpm/macros.ca-certificates
+touch %{buildroot}%{macro_ca_certificates}
+echo "%TZ_SYS_CA_BUNDLE     %{TZ_SYS_ETC}/ssl/ca-bundle.pem"        >> %{buildroot}%{macro_ca_certificates}
+echo "%TZ_SYS_CA_BUNDLE_RW  /var/lib/ca-certificates/ca-bundle.pem" >> %{buildroot}%{macro_ca_certificates}
+echo "%TZ_SYS_CA_CERTS      %{TZ_SYS_ETC}/ssl/certs"                >> %{buildroot}%{macro_ca_certificates}
+echo "%TZ_SYS_CA_CERTS_ORIG %{TZ_SYS_SHARE}/ca-certificates/certs"  >> %{buildroot}%{macro_ca_certificates}
 
 %post
 # this is just needed for those updating Factory,
@@ -87,5 +108,5 @@ chsmack -t %{etccadir}
 %{_mandir}/man8/update-ca-certificates.8*
 %ghost /var/lib/ca-certificates/ca-bundle.pem
 
-
-%changelog
+%files devel
+%config %{macro_ca_certificates}
